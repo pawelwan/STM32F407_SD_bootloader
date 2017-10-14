@@ -1,0 +1,4 @@
+nbproject/*
+obj/*
+!obj/STM32F4_Proj.hex
+!obj/STM32F4_Proj.bin
