@@ -108,6 +108,7 @@ CPPFLAGS += -D $(CHIP)
 CPPFLAGS += -D $(USB_HS_FS_DEF)
 CPPFLAGS += -D FREERTOS
 
+CPPFLAGS += -I .
 CPPFLAGS += -I drivers/inc
 CPPFLAGS += -I fatfs
 CPPFLAGS += -I FreeRTOS

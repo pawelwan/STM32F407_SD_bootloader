@@ -67,12 +67,6 @@ void debug_chr(char chr)
 	USART_SendData(USARTx, (uint16_t)chr);
 }
 
-int putChar(int ch)
-{
-	debug_chr(ch);
-	return ch;
-}
-
 
 
 //returns ascii value of last char received

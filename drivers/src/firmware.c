@@ -3,6 +3,7 @@
 #include "crc32.h"
 #include "flash.h"
 #include "ff.h"
+#include "firmware_conf.h"
 #include "firmware.h"
 
 #define HEADER_ADDR          FLASH_SECTOR_8_ADDR
