@@ -13,7 +13,6 @@ static uint8_t upload_file(const char* name);
 
 uint16_t firmware_curr_version(void) {
     FirmwareHeader_t *header = (FirmwareHeader_t *) HEADER_ADDR;
-    if (header->version == 0xFFFF) return 0;
     return header->version;
 }
 
@@ -31,7 +30,7 @@ uint16_t firmware_new_version(void) {
     if (res) return 0;
 
     res = f_read(&file, (void*) &header, HEADER_SIZE, &bytes_read);
-    if (res || sizeof(header) != bytes_read) return 0;
+    if (res || bytes_read < HEADER_SIZE) return 0;
 
     res = f_close(&file);
     if (res) return 0;
@@ -47,8 +46,8 @@ uint8_t firmware_dump(void) {
     FATFS fs;
     FIL file;
     UINT bytes_written;
-
     FirmwareHeader_t *header = (FirmwareHeader_t *) HEADER_ADDR;
+    uint32_t file_size = HEADER_SIZE + header->size;
 
     res = f_mount(DRIVE_NO, &fs);
     if (res) return 0;
@@ -56,8 +55,8 @@ uint8_t firmware_dump(void) {
     res = f_open(&file, CURR_NAME, FA_OPEN_ALWAYS | FA_WRITE);
     if (res) return 0;
 
-    res = f_write(&file, (uint8_t *) HEADER_ADDR, header->size, &bytes_written);
-    if (res || bytes_written < header->size) return 0;
+    res = f_write(&file, (uint8_t *) HEADER_ADDR, file_size, &bytes_written);
+    if (res || bytes_written < file_size) return 0;
 
     res = f_close(&file);
     if (res) return 0;
@@ -109,6 +108,7 @@ static uint8_t upload_file(const char* name) {
     FATFS fs;
     FIL file;
     UINT bytes_read;
+    uint8_t flash_res;
     uint8_t buffer[1024];
     uint32_t addr = HEADER_ADDR;
 
@@ -118,22 +118,22 @@ static uint8_t upload_file(const char* name) {
     res = f_open(&file, name, FA_OPEN_EXISTING | FA_READ);
     if (res) return 0;
 
-    for (addr = HEADER_ADDR; addr < FLASH_LAST_ADDR; addr += 0x20000) {
-        uint8_t res = flash_clear_sector(addr);
-        if (res == 0) return 0;
-    }
+    flash_res = flash_clear(HEADER_ADDR, FLASH_LAST_ADDR);
+    if (flash_res == 0) return 0;
 
     addr = HEADER_ADDR;
     for (;;) {
         res = f_read(&file, buffer, sizeof(buffer), &bytes_read);
         if (res) return 0;
         if (bytes_read < sizeof(buffer)) break;
-        addr = flash_program_by_word(addr, (uint32_t *) buffer, bytes_read);
+        addr = flash_program_by_word(addr, (uint32_t *) buffer, bytes_read / 4);
         if (addr == 0) return 0;
     }
 
-    addr = flash_program_by_byte(addr, buffer, bytes_read);
-    if (addr == 0) return 0;
+    if (bytes_read > 0) {
+        addr = flash_program_by_byte(addr, buffer, bytes_read);
+        if (addr == 0) return 0;
+    }
 
     res = f_close(&file);
     if (res) return 0;

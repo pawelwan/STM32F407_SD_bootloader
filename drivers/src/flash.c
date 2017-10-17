@@ -2,25 +2,31 @@
 
 #include "term_io.h"
 
-static uint32_t flash_get_sector(uint32_t);
+#define FLASH_STEP 0x08
+
+static uint8_t clear_sector(uint32_t);
+static uint32_t get_sector(uint32_t);
 
 uint8_t flash_clear_sector(uint32_t addr) {
-    //unlock the FLASH control register access
-    FLASH_Unlock();
+    uint32_t sector = get_sector(addr);
+    if (sector == 0) return 0;
+    return clear_sector(sector);
+}
 
-    //Clear all FLASH pending flags
-    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR |
-                    FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+uint8_t flash_clear(uint32_t from_addr, uint32_t to_addr) {
+    uint8_t res;
+    uint32_t first_sector = get_sector(from_addr);
+    uint32_t last_sector = get_sector(to_addr);
 
-    uint32_t sector = flash_get_sector(addr);
+    if (first_sector == 0 || last_sector == 0) return 0;
 
-    //VoltageRange_3 - operation will be done by word (32-bit)
-    FLASH_Status res = FLASH_EraseSector(sector, VoltageRange_3);
+    while (first_sector != last_sector) {
+        res = clear_sector(first_sector);
+        if (res == 0) return 0;
+        first_sector += FLASH_STEP;
+    }
 
-    //lock the FLASH control register access
-    FLASH_Lock();
-
-    return (res == FLASH_COMPLETE) ? 1 : 0;
+    return clear_sector(last_sector);
 }
 
 uint32_t flash_program_by_word(uint32_t addr, const uint32_t *data, uint32_t size) {
@@ -50,14 +56,31 @@ uint32_t flash_program_by_byte(uint32_t addr, const uint8_t *data, uint32_t size
             FLASH_Lock();
             return 0;
         }
-        addr += 4;
+        ++addr;
     }
 
     FLASH_Lock();
     return addr;
 }
 
-static uint32_t flash_get_sector(uint32_t addr) {
+static uint8_t clear_sector(uint32_t sector) {
+    //unlock the FLASH control register access
+    FLASH_Unlock();
+
+    //Clear all FLASH pending flags
+    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR |
+                    FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+
+    //VoltageRange_3 - operation will be done by word (32-bit)
+    FLASH_Status res = FLASH_EraseSector(sector, VoltageRange_3);
+
+    //lock the FLASH control register access
+    FLASH_Lock();
+
+    return (res == FLASH_COMPLETE) ? 1 : 0;
+}
+
+static uint32_t get_sector(uint32_t addr) {
     uint32_t sector = 0;
 
     if((addr >= FLASH_SECTOR_0_ADDR) && (addr < FLASH_SECTOR_1_ADDR))

@@ -1,6 +1,4 @@
 #include "stm32f4xx.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
 #include "stm32f4_sdio_sd.h"
 #include "term_io.h"
 
@@ -45,9 +43,6 @@ void default_handler_c (unsigned int * hardfault_args)
   while (1);
 }
 
-
-extern xSemaphoreHandle s_xSemaphore;
-extern xSemaphoreHandle ETH_link_xSemaphore;
 
 
 /**

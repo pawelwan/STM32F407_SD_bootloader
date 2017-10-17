@@ -13,7 +13,6 @@
 
 
 #define FILE_BUF_SIZE 1024
-static FATFS fs;
 static FIL file;
 static char fileBuffer[FILE_BUF_SIZE];
 
@@ -39,11 +38,6 @@ static void init(void) {
     xprintf("Clockz info: APB1 = %d Hz, APB2 = %d Hz\n", (int) RCC_ClocksStatus.PCLK1_Frequency, (int) RCC_ClocksStatus.PCLK2_Frequency);
 
     xprintf("SCB->AIRCR = %x\n", (unsigned int) SCB->AIRCR);
-
-    //FRESULT res = f_mount(1, &fs);
-    //if (res == FR_OK) xprintf("FS init OK\n");
-    //else xprintf("FS init error: %x\n", res);
-
 }
 
 static void testproc(void) {
@@ -164,7 +158,7 @@ int main(void) {
     if (update) {
         led_set(LED_RED, LED_OFF);
         //de_init();
-        //firmware_run();
+        firmware_run();
     }
     else {
         for(;;);

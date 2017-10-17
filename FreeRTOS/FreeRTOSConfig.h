@@ -33,9 +33,9 @@
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
@@ -135,7 +135,7 @@ NVIC value of 255. */
 //#define pvPortMalloc            malloc
 //#define vPortFree               free
 
-#define configTOTAL_HEAP_SIZE			(80*1024)
+#define configTOTAL_HEAP_SIZE			(10*1024)
 
 /**
  * Define the traceTASK_SWITCHED_IN() macro to output the voltage
@@ -156,4 +156,3 @@ NVIC value of 255. */
 
 
 #endif /* FREERTOS_CONFIG_H */
-

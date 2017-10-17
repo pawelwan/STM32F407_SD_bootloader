@@ -17,13 +17,16 @@
 #define FLASH_SECTOR_11_ADDR     0x080E0000          // Sector 11, 128 Kbytes
 #define FLASH_LAST_ADDR          0x080FFFFF
 
-//clear sector containing 'addr', return 1 on succes
+// clear sector containing 'addr', return 1 on success
 uint8_t flash_clear_sector(uint32_t addr);
 
-//program 'size' elements of uint32_t 'data' at 'addr', return next empty address
+// clear sectors between 'from_addr' and 'to_addr' (included), return 1 on success
+uint8_t flash_clear(uint32_t from_addr, uint32_t to_addr);
+
+// program 'size' elements of uint32_t 'data' at 'addr', return next empty address
 uint32_t flash_program_by_word(uint32_t addr, const uint32_t *data, uint32_t size);
 
-//program 'size' elements of uint8_t 'data' at 'addr', return next empty address
+// program 'size' elements of uint8_t 'data' at 'addr', return next empty address
 uint32_t flash_program_by_byte(uint32_t addr, const uint8_t *data, uint32_t size);
 
 #endif /* __FLASH_H */
