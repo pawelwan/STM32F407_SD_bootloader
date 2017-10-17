@@ -6,8 +6,8 @@
 #include "firmware_conf.h"
 #include "firmware.h"
 
-#define HEADER_ADDR          FLASH_SECTOR_8_ADDR
-#define APP_ADDR             (HEADER_ADDR + HEADER_SIZE)
+#define APP_ADDR             FLASH_SECTOR_8_ADDR
+#define HEADER_ADDR          (APP_ADDR - HEADER_SIZE)
 
 typedef void (*pFunction)(void);
 static uint8_t upload_file(const char* name);

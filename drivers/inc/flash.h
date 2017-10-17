@@ -15,7 +15,7 @@
 #define FLASH_SECTOR_9_ADDR      0x080A0000          // Sector 9, 128 Kbytes
 #define FLASH_SECTOR_10_ADDR     0x080C0000          // Sector 10, 128 Kbytes
 #define FLASH_SECTOR_11_ADDR     0x080E0000          // Sector 11, 128 Kbytes
-#define FLASH_LAST_ADDR          0x080FFFFF
+#define FLASH_LAST_ADDR          0x080FFFFE
 
 // clear sector containing 'addr', return 1 on success
 uint8_t flash_clear_sector(uint32_t addr);
