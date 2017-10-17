@@ -27,14 +27,6 @@ DRV_SRC += drivers/src/term_io.c
 FAT_SRC = fatfs/ff_io.c
 FAT_SRC += fatfs/ff.c
 
-FREE_SRC += FreeRTOS/Source/tasks.c
-FREE_SRC += FreeRTOS/Source/queue.c
-FREE_SRC += FreeRTOS/Source/list.c
-FREE_SRC += FreeRTOS/Source/croutine.c
-FREE_SRC += FreeRTOS/Source/timers.c
-FREE_SRC += FreeRTOS/Source/portable/MemMang/heap_4.c
-FREE_SRC += FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
-
 LIB_SRC += libs/STM32F4xx_StdPeriph_Driver/src/misc.c
 LIB_SRC += libs/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_adc.c
 LIB_SRC += libs/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_can.c
@@ -71,9 +63,7 @@ SD_SRC = sd/sd.c
 SD_SRC += sd/stm32f4_sdio_sd.c
 
 SRC_SRC += src/startup_stm32f4xx.s
-SRC_SRC += src/syscalls.c
 SRC_SRC += src/system_stm32f4xx.c
-SRC_SRC += src/ustime.c
 SRC_SRC += src/vectors.c
 
 # Define all C source files (dependencies are generated automatically)
@@ -81,7 +71,6 @@ SRC_SRC += src/vectors.c
 SOURCES = main.c
 SOURCES += $(DRV_SRC)
 SOURCES += $(FAT_SRC)
-SOURCES += $(FREE_SRC)
 SOURCES += $(LIB_SRC)
 SOURCES += $(SD_SRC)
 SOURCES += $(SRC_SRC)
@@ -91,15 +80,10 @@ OBJECTS  = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(basename $(SOURCES))))
 # Place -D, -U or -I options here for C and C++ sources
 CPPFLAGS += -D $(BOARD)
 CPPFLAGS += -D $(CHIP)
-CPPFLAGS += -D $(USB_HS_FS_DEF)
-CPPFLAGS += -D FREERTOS
 
 CPPFLAGS += -I .
 CPPFLAGS += -I drivers/inc
 CPPFLAGS += -I fatfs
-CPPFLAGS += -I FreeRTOS
-CPPFLAGS += -I FreeRTOS/Source/include
-CPPFLAGS += -I FreeRTOS/Source/portable/GCC/ARM_CM4F
 CPPFLAGS += -I libs/CMSIS/Include
 CPPFLAGS += -I libs/Device/STM32F4xx/Include
 CPPFLAGS += -I libs/STM32F4xx_StdPeriph_Driver/inc
@@ -119,12 +103,12 @@ CFLAGS += -gdwarf-2
 CFLAGS += -ffunction-sections
 CFLAGS += -fdata-sections
 CFLAGS += -Wall
-#CFLAGS += -Wextra
+CFLAGS += -Wextra
 CFLAGS += -Wpointer-arith
 CFLAGS += -Wstrict-prototypes
 CFLAGS += -Winline
 CFLAGS += -Wunreachable-code
-#CFLAGS += -Wundef
+CFLAGS += -Wundef
 CFLAGS += -Wa,-adhlns=$(OBJDIR)/$(*F).lst
 
 # Optimize use of the single-precision FPU
@@ -285,8 +269,6 @@ $(OBJDIR)/%.o : %.s
 $(shell mkdir -p $(OBJDIR) 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/drivers/src 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/fatfs 2>/dev/null)
-$(shell mkdir -p $(OBJDIR)/FreeRTOS/Source/portable/GCC/ARM_CM4F 2>/dev/null)
-$(shell mkdir -p $(OBJDIR)/FreeRTOS/Source/portable/MemMang/ 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/libs/STM32F4xx_StdPeriph_Driver/src/ 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/sd 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/src 2>/dev/null)

@@ -5,15 +5,8 @@
 #include "led.h"
 #include "sd.h"
 #include "ff.h"
-#include "FreeRTOS.h"
-#include "task.h"
 
 #include "term_io.h"
-
-
-#define FILE_BUF_SIZE 1024
-static FIL file;
-static char fileBuffer[FILE_BUF_SIZE];
 
 static void init(void) {
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
@@ -78,11 +71,6 @@ int main(void) {
     else {
         for(;;);
     }
-}
-
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
-    xprintf("FreeRTOS stack overflow @\n  task name: %s\n  task handle address %X\n", pcTaskName, (int) xTask);
-    while (1);
 }
 
 void assert_failed(uint8_t* file, uint32_t line) {

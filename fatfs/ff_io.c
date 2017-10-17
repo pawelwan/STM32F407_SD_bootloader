@@ -1,6 +1,4 @@
 #include "stm32f4xx.h"
-#include "FreeRTOS.h"
-#include "task.h"
 #include "diskio.h"
 #include "sd.h"
 
@@ -34,7 +32,6 @@ DSTATUS disk_initialize (BYTE lun)
 					status[lun] = 0;
 					return(0);
 				}
-				vTaskDelay(200);
 			}
 			debug_msg("SD Card init failed");
 			status[lun] = STA_NOINIT;
@@ -85,7 +82,7 @@ DRESULT disk_write (BYTE lun, const BYTE* buffer, DWORD lba, BYTE count)
 		case SD_CARD:
 		{
 			if(
-				sdWriteBlocks(lba,count,buffer) != 0
+				sdWriteBlocks(lba,count,(uint8_t *)buffer) != 0
 				)
 				{
 					xprintf("sdReadBlocks error, lba=%X, count=%X\n",(unsigned)lba,(unsigned)count);
