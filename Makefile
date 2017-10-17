@@ -76,19 +76,6 @@ SRC_SRC += src/system_stm32f4xx.c
 SRC_SRC += src/ustime.c
 SRC_SRC += src/vectors.c
 
-USBH_SRC = usb_host/src/usb_bsp.c
-USBH_SRC += usb_host/src/usb_core.c
-USBH_SRC += usb_host/src/usb_hcd_int.c
-USBH_SRC += usb_host/src/usb_hcd.c
-USBH_SRC += usb_host/src/usbh_core.c
-USBH_SRC += usb_host/src/usbh_hcs.c
-USBH_SRC += usb_host/src/usbh_ioreq.c
-USBH_SRC += usb_host/src/usbh_msc_bot.c
-USBH_SRC += usb_host/src/usbh_msc_core.c
-USBH_SRC += usb_host/src/usbh_msc_scsi.c
-USBH_SRC += usb_host/src/usbh_stdreq.c
-USBH_SRC += usb_host/src/usbh_usr.c
-
 # Define all C source files (dependencies are generated automatically)
 #
 SOURCES = main.c
@@ -98,7 +85,6 @@ SOURCES += $(FREE_SRC)
 SOURCES += $(LIB_SRC)
 SOURCES += $(SD_SRC)
 SOURCES += $(SRC_SRC)
-SOURCES += $(USBH_SRC)
 
 OBJECTS  = $(addprefix $(OBJDIR)/,$(addsuffix .o,$(basename $(SOURCES))))
 
@@ -119,7 +105,6 @@ CPPFLAGS += -I libs/Device/STM32F4xx/Include
 CPPFLAGS += -I libs/STM32F4xx_StdPeriph_Driver/inc
 CPPFLAGS += -I sd
 CPPFLAGS += -I src
-CPPFLAGS += -I usb_host/inc
 
 #---------------- Compiler Options C ----------------
 #  -g*:          generate debugging information
@@ -305,7 +290,6 @@ $(shell mkdir -p $(OBJDIR)/FreeRTOS/Source/portable/MemMang/ 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/libs/STM32F4xx_StdPeriph_Driver/src/ 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/sd 2>/dev/null)
 $(shell mkdir -p $(OBJDIR)/src 2>/dev/null)
-$(shell mkdir -p $(OBJDIR)/usb_host/src 2>/dev/null)
 
 # Include the dependency files
 -include $(wildcard $(OBJDIR)/*.d)
