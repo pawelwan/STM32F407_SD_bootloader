@@ -38,6 +38,8 @@ void debug_init(void) {
 void debug_deinit(void) {
 	USART_Cmd(USART1, DISABLE);
 	USART_DeInit(USART1);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_MCO);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_MCO);
 	GPIO_DeInit(GPIOB);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, DISABLE);

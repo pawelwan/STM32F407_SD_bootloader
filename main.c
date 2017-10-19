@@ -1,6 +1,7 @@
 #include "stm32f4xx.h"
 #include "firmware.h"
 #include "led.h"
+#include "sd.h"
 
 #include "term_io.h"
 
@@ -75,6 +76,9 @@ static void init(void) {
 }
 
 static void deinit(void) {
+    SD_LowLevel_DeInit();
+    xprintf("SD deinitialized");
+
     led_deinit();
     xprintf("led deinitialized");
 
