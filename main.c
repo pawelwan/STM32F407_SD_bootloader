@@ -1,78 +1,84 @@
-#include <string.h>
-
 #include "stm32f4xx.h"
 #include "firmware.h"
 #include "led.h"
-#include "sd.h"
-#include "ff.h"
 
 #include "term_io.h"
 
-static void init(void) {
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+typedef uint8_t (*func_t)(void);
 
-    led_init();
-    debug_init();
-
-    RCC_ClocksTypeDef RCC_ClocksStatus;
-    RCC_GetClocksFreq(&RCC_ClocksStatus);
-
-    xprintf("Clockz info: APB1 = %d Hz, APB2 = %d Hz\n", (int) RCC_ClocksStatus.PCLK1_Frequency, (int) RCC_ClocksStatus.PCLK2_Frequency);
-    xprintf("SCB->AIRCR = %x\n", (unsigned int) SCB->AIRCR);
-}
-
-static void deinit(void) {
-    led_deinit();
-    debug_deinit();
-}
+static void error(void);
+static void check_and_run(void);
+static uint8_t update_and_check(func_t func);
+static void deinit_and_run(void);
+static void init(void);
+static void deinit(void);
 
 int main(void) {
     init();
 
-    led_set(LED_RED, LED_ON);
-
-    uint8_t update = 1;
-
-    firmware_init();  // TODO: check if mounted
+    uint8_t res = firmware_init();
+    if (!res) check_and_run();
 
     uint16_t curr_ver = firmware_curr_version();
     uint16_t new_ver = firmware_new_version();
 
-    led_set(LED_ORANGE, LED_ON);
-
-    if (curr_ver < new_ver) {
-        update = 0;
+    if (curr_ver >= new_ver) check_and_run();
+    else {
+        uint8_t update;
         uint8_t dump_res = firmware_dump();
 
-        uint8_t update_res = firmware_update();
-        if (update_res) update = firmware_integrity();
+        update = update_and_check(firmware_update);
+        if (update) deinit_and_run();
 
-        led_set(LED_BLUE, LED_ON);
-
-        if (!update) {
-            led_set(LED_BLUE, LED_OFF);
-            if (dump_res) {
-                update_res = firmware_restore();
-                if (update_res) update = firmware_integrity();
-            }
-            if (!update) {
-                led_set(LED_ORANGE, LED_OFF);
-                update_res = firmware_basic();
-                if (update_res) update = firmware_integrity();
-            }
+        if (dump_res) {
+            update = update_and_check(firmware_restore);
+            if (update) deinit_and_run();
         }
+
+        update = update_and_check(firmware_basic);
+        if (update) deinit_and_run();
     }
 
+    error();
+}
+
+static void error(void) {
+    xprintf("error");
+    for(;;);
+}
+
+static void check_and_run(void) {
+    if (firmware_integrity()) deinit_and_run();
+    else error();
+}
+
+static uint8_t update_and_check(func_t func) {
+    uint8_t update_res = func();
+    if (update_res) return firmware_integrity();
+    return 0;
+}
+
+static void deinit_and_run(void) {
+    firmware_deinit();
     deinit();
+    firmware_run();
+}
 
-    if (update) {
-        led_set(LED_RED, LED_OFF);
-        //de_init();
-        firmware_run();
-    }
-    else {
-        for(;;);
-    }
+static void init(void) {
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+    debug_init();
+    xprintf("debug initialized");
+
+    led_init();
+    xprintf("led initialized");
+}
+
+static void deinit(void) {
+    led_deinit();
+    xprintf("led deinitialized");
+
+    debug_deinit();
 }
 
 void assert_failed(uint8_t* file, uint32_t line) {
