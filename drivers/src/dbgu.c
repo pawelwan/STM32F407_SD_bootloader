@@ -1,31 +1,12 @@
 #include "dbgu.h"
 
-#define USARTx USART1
 
-void dbg_shdn(uint32_t shdn_on)
-{
-	if(shdn_on)
-	{
-		RCC->APB2ENR &=~RCC_APB2Periph_USART1;
-	}
-	else
-	{
-		RCC->APB2ENR |= RCC_APB2Periph_USART1;
-	}
-
-
-}
-
-
-void debug_init_default(void)
-{
+void debug_init(void) {
 	// Enable peripheral clocks
-	//
-	RCC->AHB1ENR |= RCC_AHB1Periph_GPIOB;
-	RCC->APB2ENR |= RCC_APB2Periph_USART1;
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
 	// Initialize Serial Port
-	//
 	GPIO_Init(GPIOB, &(GPIO_InitTypeDef) {
 		.GPIO_Pin   = GPIO_Pin_6,
 		.GPIO_Speed = GPIO_Speed_50MHz,
@@ -54,55 +35,26 @@ void debug_init_default(void)
 	USART_Cmd(USART1, ENABLE);
 }
 
-int debug_test(void)
-{
-	return ( USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET ) ? 0 : 1;
+void debug_deinit(void) {
+	USART_Cmd(USART1, DISABLE);
+	USART_DeInit(USART1);
+	GPIO_DeInit(GPIOB);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, DISABLE);
 }
 
-
-//send chr via UART (platform dependent)
-void debug_chr(char chr)
-{
-	while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET) { ; }
-	USART_SendData(USARTx, (uint16_t)chr);
+int debug_test(void) {
+	return (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET) ? 0 : 1;
 }
 
-
-
-//returns ascii value of last char received
-//returns 0 if no char was received since last debug_inkey call
-//(platform dependent)
-char debug_inkey(void)
-{
-	if(USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET)
-		return(0);
-	else
-		return (unsigned char)USART_ReceiveData(USARTx);
+// send chr via UART (platform dependent)
+void debug_chr(char chr) {
+	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+	USART_SendData(USART1, (uint16_t) chr);
 }
 
-//halts program/task execution until char is received
-//(platform dependent)
-char debug_waitkey(void)
-{
-	while(USART_GetFlagStatus(USARTx, USART_FLAG_RXNE) == RESET) { ; }
-	return (unsigned char)USART_ReceiveData(USARTx);
-}
-
-
-//platform independent funcs
-
-
-//prints text starting at str
-//adds new line at end
-void debug_msg(const char *str)
-{
-	debug_txt(str);
-	debug_chr('\r');
-	debug_chr('\n');
-}
-
-//prints text starting at str
-void debug_txt(const char *str)
-{
-	while(*str) debug_chr(*str++);
+// halts program/task execution until char is received
+char debug_waitkey(void) {
+	while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
+	return (unsigned char) USART_ReceiveData(USART1);
 }

@@ -15,8 +15,6 @@ TARGET = $(OBJDIR)/STM32F4_Proj
 BOARD = USE_STM32F4_DISCOVERY
 CHIP = STM32F4x7
 
-USB_HS_FS_DEF = USE_USB_OTG_FS
-
 DRV_SRC = drivers/src/crc32.c
 DRV_SRC += drivers/src/dbgu.c
 DRV_SRC += drivers/src/firmware.c

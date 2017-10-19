@@ -3,6 +3,8 @@
 
 #include "stm32f4xx.h"
 
+uint8_t firmware_init(void);
+uint8_t firmware_deinit(void);
 uint16_t firmware_curr_version(void);
 uint16_t firmware_new_version(void);
 uint8_t firmware_dump(void);

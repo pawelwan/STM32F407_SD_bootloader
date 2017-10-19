@@ -9,23 +9,21 @@
 #include "term_io.h"
 
 static void init(void) {
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
-
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
     led_init();
-
-    debug_init_default();
+    debug_init();
 
     RCC_ClocksTypeDef RCC_ClocksStatus;
     RCC_GetClocksFreq(&RCC_ClocksStatus);
-    xprintf("Clockz info: APB1 = %d Hz, APB2 = %d Hz\n", (int) RCC_ClocksStatus.PCLK1_Frequency, (int) RCC_ClocksStatus.PCLK2_Frequency);
 
+    xprintf("Clockz info: APB1 = %d Hz, APB2 = %d Hz\n", (int) RCC_ClocksStatus.PCLK1_Frequency, (int) RCC_ClocksStatus.PCLK2_Frequency);
     xprintf("SCB->AIRCR = %x\n", (unsigned int) SCB->AIRCR);
+}
+
+static void deinit(void) {
+    led_deinit();
+    debug_deinit();
 }
 
 int main(void) {
@@ -34,6 +32,8 @@ int main(void) {
     led_set(LED_RED, LED_ON);
 
     uint8_t update = 1;
+
+    firmware_init();  // TODO: check if mounted
 
     uint16_t curr_ver = firmware_curr_version();
     uint16_t new_ver = firmware_new_version();
@@ -62,6 +62,8 @@ int main(void) {
             }
         }
     }
+
+    deinit();
 
     if (update) {
         led_set(LED_RED, LED_OFF);

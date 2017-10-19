@@ -1,6 +1,8 @@
 #include "led.h"
 
 void led_init(void) {
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
     GPIO_Init(GPIOD, &(GPIO_InitTypeDef) {
         .GPIO_Pin   = GPIO_Pin_7 | GPIO_Pin_1 | GPIO_Pin_0,
         .GPIO_Mode  = GPIO_Mode_OUT,
@@ -8,6 +10,11 @@ void led_init(void) {
         .GPIO_PuPd  = GPIO_PuPd_NOPULL,
         .GPIO_Speed = GPIO_Speed_50MHz,
     });
+}
+
+void led_deinit(void) {
+    GPIO_DeInit(GPIOD);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE);
 }
 
 void led_set(led_id_t led_id, led_action_t led_action) {

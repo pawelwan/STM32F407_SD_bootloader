@@ -16,6 +16,7 @@ typedef enum {
 } led_id_t;
 
 void led_init(void);
+void led_deinit(void);
 void led_set(led_id_t led_id, led_action_t led_action);
 uint8_t led_state(led_id_t led_id);
 

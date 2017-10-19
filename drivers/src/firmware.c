@@ -12,6 +12,25 @@
 typedef void (*pFunction)(void);
 static uint8_t upload_file(const char* name);
 
+uint8_t firmware_init(void) {
+    FRESULT res;
+    FATFS fs;
+
+    res = f_mount(DRIVE_NO, &fs);
+    if (res) return 0;
+
+    return 1;
+}
+
+uint8_t firmware_deinit(void) {
+    FRESULT res;
+
+    res = f_mount(DRIVE_NO, NULL);
+    if (res) return 0;
+
+    return 1;
+}
+
 uint16_t firmware_curr_version(void) {
     FirmwareHeader_t *header = (FirmwareHeader_t *) HEADER_ADDR;
     return header->version;
@@ -19,13 +38,9 @@ uint16_t firmware_curr_version(void) {
 
 uint16_t firmware_new_version(void) {
     FRESULT res;
-    FATFS fs;
     FIL file;
     UINT bytes_read;
     FirmwareHeader_t header;
-
-    res = f_mount(DRIVE_NO, &fs);
-    if (res) return 0;
 
     res = f_open(&file, NEW_NAME, FA_OPEN_EXISTING | FA_READ);
     if (res) return 0;
@@ -36,22 +51,15 @@ uint16_t firmware_new_version(void) {
     res = f_close(&file);
     if (res) return 0;
 
-    res = f_mount(DRIVE_NO, NULL);
-    if (res) return 0;
-
     return header.version;
 }
 
 uint8_t firmware_dump(void) {
     FRESULT res;
-    FATFS fs;
     FIL file;
     UINT bytes_written;
     FirmwareHeader_t *header = (FirmwareHeader_t *) HEADER_ADDR;
     uint32_t file_size = HEADER_SIZE + header->size;
-
-    res = f_mount(DRIVE_NO, &fs);
-    if (res) return 0;
 
     res = f_open(&file, CURR_NAME, FA_OPEN_ALWAYS | FA_WRITE);
     if (res) return 0;
@@ -60,9 +68,6 @@ uint8_t firmware_dump(void) {
     if (res || bytes_written < file_size) return 0;
 
     res = f_close(&file);
-    if (res) return 0;
-
-    res = f_mount(DRIVE_NO, NULL);
     if (res) return 0;
 
     return 1;
@@ -106,15 +111,11 @@ void firmware_run(void) {
 
 static uint8_t upload_file(const char* name) {
     FRESULT res;
-    FATFS fs;
     FIL file;
     UINT bytes_read;
     uint8_t flash_res;
     uint8_t buffer[1024];
     uint32_t addr = HEADER_ADDR;
-
-    res = f_mount(DRIVE_NO, &fs);
-    if (res) return 0;
 
     res = f_open(&file, name, FA_OPEN_EXISTING | FA_READ);
     if (res) return 0;
@@ -137,9 +138,6 @@ static uint8_t upload_file(const char* name) {
     }
 
     res = f_close(&file);
-    if (res) return 0;
-
-    res = f_mount(DRIVE_NO, NULL);
     if (res) return 0;
 
     return 1;
