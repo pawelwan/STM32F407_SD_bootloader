@@ -1,3 +1,6 @@
+# platform dependent variables
+ST_LINK = "C:\Program Files (x86)\STMicroelectronics\STM32 ST-LINK Utility\ST-LINK Utility\ST-LINK_CLI.exe"
+
 # Optimization level, can be [0, 1, 2, 3, s].
 #     0 = turn off optimization. s = optimize for size.
 #
@@ -142,21 +145,12 @@ LDFLAGS += -Tsrc/stm32_flash.ld
 
 # Define programs and commands
 TOOLCHAIN = arm-none-eabi
-CC        = $(TOOLCHAIN)-gcc
-# Path to linux compiler
+ARM_GCC   = $(TOOLCHAIN)-gcc
 OBJCOPY   = $(TOOLCHAIN)-objcopy
 OBJDUMP   = $(TOOLCHAIN)-objdump
 SIZE      = $(TOOLCHAIN)-size
 NM        = $(TOOLCHAIN)-nm
 OPENOCD   = openocd
-STLINK    = tools/ST-LINK_CLI.exe
-
-
-ifeq (AMD64, $(PROCESSOR_ARCHITEW6432))
-  SUBWCREV = tools/SubWCRev64.exe
-else
-  SUBWCREV = tools/SubWCRev.exe
-endif
 
 
 # Compiler flags to generate dependency files
@@ -180,18 +174,18 @@ LDFLAGS  += $(CPU)
 # Default target.
 all:  gccversion build showsize
 
-build: elf bin hex
+build: elf hex bin
 
 elf: $(TARGET).elf
-bin: $(TARGET).bin
 hex: $(TARGET).hex
 lss: $(TARGET).lss
 sym: $(TARGET).sym
+bin: $(TARGET).bin
 
 
 # Display compiler version information
 gccversion:
-	@$(CC) --version
+	@$(ARM_GCC) --version
 
 # Show the final program size
 showsize: elf
@@ -202,10 +196,9 @@ showsize: elf
 # Flash the device
 #flash: hex
 #	$(OPENOCD) -f "openocd.cfg" -c "flash_image $(TARGET).elf; shutdown"
-#	$(STLINK) -c SWD -P $(TARGET).hex -Run
 
 program: hex
-	"C:\Program Files (x86)\STMicroelectronics\STM32 ST-LINK Utility\ST-LINK Utility\ST-LINK_CLI.exe" -HardRst -c SWD -ME -P $(TARGET).hex -Rst
+	$(ST_LINK) -HardRst -c SWD -ME -P $(TARGET).hex -Rst
 
 program_linux: elf
 	openocd -f /home/john/openocd-0.9.0/tcl/board/stm32f4discovery.cfg -c "program $(TARGET).elf verify reset exit"
@@ -239,7 +232,7 @@ clean:
 $(TARGET).elf: $(OBJECTS)
 	@echo
 	@echo Linking: $@
-	$(CC) $^ $(LDFLAGS) --output $@
+	$(ARM_GCC) $^ $(LDFLAGS) --output $@
 
 
 # Create final output files (.hex, .eep) from ELF output file.
@@ -255,13 +248,13 @@ $(TARGET).elf: $(OBJECTS)
 $(OBJDIR)/%.o : %.c
 	@echo
 	@echo Compiling C: $<
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@
+	$(ARM_GCC) -c $(CPPFLAGS) $(CFLAGS) $(GENDEPFLAGS) $< -o $@
 
 # Assemble: create object files from assembler source files
 $(OBJDIR)/%.o : %.s
 	@echo
 	@echo Assembling: $<
-	$(CC) -c $(CPPFLAGS) $(ASFLAGS) $< -o $@
+	$(ARM_GCC) -c $(CPPFLAGS) $(ASFLAGS) $< -o $@
 
 # Create object file directories
 $(shell mkdir -p $(OBJDIR) 2>/dev/null)
