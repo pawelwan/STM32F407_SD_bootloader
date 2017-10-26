@@ -16,7 +16,7 @@ set PATH=%PATH%;C:\Program Files\GNU ARM Eclipse\Build Tools\2.8-201611221915\bi
 ```
 + Linux:
 ```
-export PATH=$PATH:/opt/gcc-arm-none-eabi-4_8-2014q1/bin
+export PATH=$PATH:/opt/gcc-arm-none-eabi-6-2017-q2-update/bin
 ```
 
 Then, you can use `make` command, for example:
@@ -40,7 +40,7 @@ set PATH=%PATH%;C:\Program Files\STMicroelectronics\STM32 ST-LINK Utility\ST-LIN
 ```
 + Linux:
 ```
-export PATH=$PATH:~/opt/gnuarmeclipse/openocd/0.10.0-201510281129-dev/bin
+export PATH=$PATH:/opt/gnu-mcu-eclipse/openocd/0.10.0-4-20171004-0812-dev/bin
 ```
 
 Then use applicable `make` command:
