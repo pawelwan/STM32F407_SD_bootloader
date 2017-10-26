@@ -29,7 +29,11 @@ DSTATUS disk_initialize(BYTE lun) {
 }
 
 DSTATUS disk_status(BYTE lun) {
-	return status;
+	if (lun == SD_CARD) {
+		return status;
+	}
+
+	return STA_NOINIT;
 }
 
 DRESULT disk_read(BYTE lun, BYTE *buffer, DWORD lba, BYTE count) {

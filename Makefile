@@ -13,7 +13,7 @@ OPT = 2
 OBJDIR = obj
 
 # Target file name (without extension)
-TARGET = $(OBJDIR)/STM32F4_Proj
+TARGET = $(OBJDIR)/STM32F407_bootloader
 
 BOARD = USE_STM32F4_DISCOVERY
 CHIP = STM32F4x7
