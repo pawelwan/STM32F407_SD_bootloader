@@ -1,6 +1,3 @@
-# platform dependent variables
-ST_LINK = "C:\Program Files (x86)\STMicroelectronics\STM32 ST-LINK Utility\ST-LINK Utility\ST-LINK_CLI.exe"
-
 # Optimization level, can be [0, 1, 2, 3, s].
 #     0 = turn off optimization. s = optimize for size.
 #
@@ -150,6 +147,7 @@ OBJCOPY   = $(TOOLCHAIN)-objcopy
 OBJDUMP   = $(TOOLCHAIN)-objdump
 SIZE      = $(TOOLCHAIN)-size
 NM        = $(TOOLCHAIN)-nm
+ST_LINK   = ST-LINK_CLI
 OPENOCD   = openocd
 
 
@@ -194,15 +192,11 @@ showsize: elf
 
 
 # Flash the device
-#flash: hex
-#	$(OPENOCD) -f "openocd.cfg" -c "flash_image $(TARGET).elf; shutdown"
-
-program: hex
+program_windows: hex
 	$(ST_LINK) -HardRst -c SWD -ME -P $(TARGET).hex -Rst
 
 program_linux: elf
-	openocd -f /home/john/openocd-0.9.0/tcl/board/stm32f4discovery.cfg -c "program $(TARGET).elf verify reset exit"
-#	st-flash write $(TARGET).hex 0x08000000
+	openocd -f board/stm32f4discovery.cfg -c "program $(TARGET).elf verify reset exit"
 
 
 # Target: clean project
@@ -270,6 +264,6 @@ $(shell mkdir -p $(OBJDIR)/src 2>/dev/null)
 
 # Listing of phony targets
 .PHONY: all build clean \
-	 	program program_linux  \
-        elf bin hex lss sym \
-        showsize gccversion
+		program_windows program_linux  \
+		elf bin hex lss sym \
+		showsize gccversion

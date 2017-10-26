@@ -12,9 +12,10 @@
 typedef void (*pFunction)(void);
 static uint8_t upload_file(const char* name);
 
+FATFS fs;
+
 uint8_t firmware_init(void) {
     FRESULT res;
-    FATFS fs;
 
     res = f_mount(DRIVE_NO, &fs);
     if (res) return 0;
