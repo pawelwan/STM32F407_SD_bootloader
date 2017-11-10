@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 
 #include "crc32.h"
 #include "flash.h"
@@ -17,6 +18,7 @@ FATFS fs;
 uint8_t firmware_init(void) {
     FRESULT res;
 
+    memset(&fs, 0, sizeof(fs));
     res = f_mount(DRIVE_NO, &fs);
     if (res) return 0;
 
@@ -43,6 +45,7 @@ uint16_t firmware_new_version(void) {
     UINT bytes_read;
     FirmwareHeader_t header;
 
+    memset(&file, 0, sizeof(file));
     res = f_open(&file, NEW_NAME, FA_OPEN_EXISTING | FA_READ);
     if (res) return 0;
 
@@ -62,6 +65,7 @@ uint8_t firmware_dump(void) {
     FirmwareHeader_t *header = (FirmwareHeader_t *) HEADER_ADDR;
     uint32_t file_size = HEADER_SIZE + header->size;
 
+    memset(&file, 0, sizeof(file));
     res = f_open(&file, CURR_NAME, FA_OPEN_ALWAYS | FA_WRITE);
     if (res) return 0;
 
@@ -118,6 +122,7 @@ static uint8_t upload_file(const char* name) {
     uint8_t buffer[1024];
     uint32_t addr = HEADER_ADDR;
 
+    memset(&file, 0, sizeof(file));
     res = f_open(&file, name, FA_OPEN_EXISTING | FA_READ);
     if (res) return 0;
 
