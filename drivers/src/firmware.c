@@ -7,7 +7,7 @@
 #include "firmware_conf.h"
 #include "firmware.h"
 
-#define APP_ADDR             FLASH_SECTOR_8_ADDR
+#define APP_ADDR             FLASH_SECTOR_4_ADDR
 #define HEADER_ADDR          (APP_ADDR - HEADER_SIZE)
 
 typedef void (*pFunction)(void);
